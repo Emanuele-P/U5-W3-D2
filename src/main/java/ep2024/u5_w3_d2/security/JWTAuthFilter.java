@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.pulsar.PulsarProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,8 +39,16 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         jwtTools.verifyToken(accessToken);
         String id = jwtTools.extractIdFromToken(accessToken);
         Optional<Employee> currentUser = employeesDAO.findById(UUID.fromString(id));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(currentUser, null, currentUser.get().getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (currentUser.isPresent()) {
+            Employee currentAuthorized = currentUser.get();
+            Authentication authentication = new UsernamePasswordAuthenticationToken(currentAuthorized, null, currentAuthorized.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("Authenticated user: " + currentAuthorized);
+        } else {
+            throw new UnauthorizedException("User not found.");
+        }
+
         filterChain.doFilter(request, response);
     }
 
