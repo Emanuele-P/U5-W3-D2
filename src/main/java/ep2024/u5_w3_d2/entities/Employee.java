@@ -39,7 +39,7 @@ public class Employee implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
     private List<Device> devices = new ArrayList<>();
 
     public Employee(String username, String firstName, String lastName, String email, String password, String avatarURL) {

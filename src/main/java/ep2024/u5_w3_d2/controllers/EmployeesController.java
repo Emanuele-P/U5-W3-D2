@@ -76,7 +76,6 @@ public class EmployeesController {
 
     //6. UPLOAD AVATAR http://localhost:3001/employees/{id}/avatar (+body)
     @PostMapping("/{id}/avatar")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Employee uploadAvatar(@PathVariable UUID id, @RequestParam("avatar") MultipartFile image) throws IOException {
         String avatarURL = employeesService.uploadAvatar(image);
         return employeesService.updateAvatar(id, avatarURL);

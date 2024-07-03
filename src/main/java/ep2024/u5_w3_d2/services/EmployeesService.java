@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,9 @@ public class EmployeesService {
     @Autowired
     private Cloudinary cloudinaryUploader;
 
+    @Autowired
+    private PasswordEncoder bcrypt;
+
     public Employee save(EmployeeDTO body) {
         employeesDAO.findByEmail(body.email()).ifPresent(
                 employee -> {
@@ -44,7 +48,7 @@ public class EmployeesService {
                 }
         );
 
-        Employee newEmployee = new Employee(body.username(), body.firstName(), body.lastName(), body.email(), body.password(), body.avatarUrl());
+        Employee newEmployee = new Employee(body.username(), body.firstName(), body.lastName(), body.email(), bcrypt.encode(body.password()), body.avatarUrl());
         newEmployee.setAvatarURL("https://ui-avatars.com/api/?name=" + newEmployee.getFirstName() + '+' + newEmployee.getLastName());
         return employeesDAO.save(newEmployee);
     }
